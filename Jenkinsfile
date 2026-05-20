@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "milind1122/java_applicationdevopsproject"
+        DOCKER_IMAGE = "kajal0611/majorproject"
         DOCKER_TAG = "${BUILD_NUMBER}"
         REGION = "ap-south-1"
         CLUSTER_NAME = "java-eks-cluster"
-        SONARQUBE_URL = "http://13.233.65.153:9000"
+        SONARQUBE_URL = "http://43.205.113.95:9000"
         SONAR_PROJECT_KEY = "java-app"
         SONAR_TOKEN = credentials('sonar-token') // Store token securely in Jenkins credentials
     }
@@ -26,7 +26,7 @@ pipeline {
                 sonar-scanner \
                 -Dsonar.projectKey=java-app \
                 -Dsonar.sources=. \
-                -Dsonar.host.url=http://13.233.65.153:9000 \
+                -Dsonar.host.url=http://43.205.113.95:9000 \
                 -Dsonar.token=$SONAR_TOKEN \
                 -Dsonar.userHome=$WORKSPACE/.sonar
                 '''
@@ -61,16 +61,6 @@ pipeline {
                 docker push $DOCKER_IMAGE:$DOCKER_TAG
                 docker tag $DOCKER_IMAGE:$DOCKER_TAG $DOCKER_IMAGE:latest
                 docker push $DOCKER_IMAGE:latest
-                '''
-            }
-        }
-
-        stage('Deploy to EKS') {
-            steps {
-                sh '''
-                aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-                kubectl set image deployment/java-war-deployment \
-                java-war-container=$DOCKER_IMAGE:$DOCKER_TAG
                 '''
             }
         }
